@@ -171,7 +171,13 @@ static void addSignature(DNSSECKeeper& dk, UeberBackend& db, const DNSName& sign
 uint64_t signatureCacheSize(const std::string& str)
 {
   ReadLock l(&g_signatures_lock);
-  return g_signatures.size();
+
+  uint64_t cacheSize = 0;
+  for(int idx = 0; idx < 128; idx++) {
+    cacheSize += g_signatures[idx].size();
+  }
+
+  return cacheSize;
 }
 
 static bool rrsigncomp(const DNSZoneRecord& a, const DNSZoneRecord& b)
