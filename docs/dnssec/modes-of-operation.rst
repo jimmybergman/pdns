@@ -86,11 +86,21 @@ are used for the calculation.
 
 RRSIGs have a validity period, in PowerDNS this period is 3 weeks.
 This period starts at most a week in the past, and continues at least a week into the future.
-This interval jumps with one-week increments every Thursday.
+This interval jumps with one-week increments every Thursday. This is then
+shifted by a number of seconds depending on the zone, so that the start of the
+time period varies. I.e. some zones are from Friday to Friday, some are from
+Saturday to Saturday, etc. We use 128 distinct start dates.
+
+This two-week interval jumps with one-week increments every week at the same
+time (for a specific zone and all other zones mapped to the same start date).
+
 
 The time period used is always calculated based on the moment of rollover.
-The inception timestamp is the most recent Thursday 00:00:00 UTC, which is exactly one week ago at the moment of rollover.
-The expiry timestamp is the Thursday 00:00:00 UTC two weeks later from the moment of rollover.
+The inception timestamp (before the per-zone shifting) is the most recent
+Thursday 00:00:00 UTC, which is exactly one week ago at the moment of rollover.
+The expiry timestamp is the Thursday 00:00:00 UTC two weeks later from the
+moment of rollover.
+
 Graphically, it looks like this::
 
   RRSIG(1) Inception                                                    RRSIG(1) Expiry
@@ -116,7 +126,9 @@ At all times, only one RRSIG per signed RRset per ZSK is served when responding 
   Why Thursday? POSIX-based operating systems count the time
   since GMT midnight January 1st of 1970, which was a Thursday. PowerDNS
   inception/expiration times are generated based on an integral number of
-  weeks having passed since the start of the 'epoch'.
+  weeks having passed since the start of the 'epoch'. A per-zone offset
+  between 0 and 600075 is then applied to +this to spread the signature
+  over the week in 128 chunks, each 4725 seconds long.
 
 PowerDNS also serves the DNSKEY records in live-signing mode. Their TTL
 is derived from the SOA records *minimum* field. When using NSEC3, the

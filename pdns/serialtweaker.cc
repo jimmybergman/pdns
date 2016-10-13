@@ -40,8 +40,11 @@ uint32_t localtime_format_YYYYMMDDSS(time_t t, uint32_t seq)
 
 uint32_t calculateEditSOA(uint32_t old_serial, const string& kind, const DNSName& zonename)
 {
+  uint32_t startOfWeekOffset = getStartOfWeekOffset(rr.dr.d_name);
+  time_t inception;
+  std::tie(inception, std::ignore) = getStartOfWeek(startOfWeekOffset);
+
   if(pdns_iequals(kind,"INCEPTION-INCREMENT")) {
-    time_t inception = getStartOfWeek();
     uint32_t inception_serial = localtime_format_YYYYMMDDSS(inception, 1);
     uint32_t dont_increment_after = localtime_format_YYYYMMDDSS(inception + 2*86400, 99);
 
@@ -55,14 +58,12 @@ uint32_t calculateEditSOA(uint32_t old_serial, const string& kind, const DNSName
     }
   }
   else if(pdns_iequals(kind,"INCREMENT-WEEKS")) {
-    time_t inception = getStartOfWeek();
     return (old_serial + (inception / (7*86400)));
   }
   else if(pdns_iequals(kind,"EPOCH")) {
     return time(0);
   }
   else if(pdns_iequals(kind,"INCEPTION-EPOCH")) {
-    uint32_t inception = getStartOfWeek();
     if (old_serial < inception)
       return inception;
   } else if(!kind.empty()) {
