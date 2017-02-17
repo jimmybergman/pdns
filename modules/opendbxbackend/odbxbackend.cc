@@ -529,7 +529,7 @@ void OdbxBackend::getAllMasters( vector<DomainInfo>* domains )
         {
         	DLOG( g_log.log( m_myname + " getAllMasters()", Logger::Debug ) );
 
-        	if( updated == NULL )
+        	if( domains == NULL )
         	{
         		g_log.log( m_myname + " getAllMasters: invalid parameter - NULL pointer",  Logger::Error );
         		return;

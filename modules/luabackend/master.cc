@@ -28,7 +28,6 @@
 #include "pdns/logger.hh"
 #include "pdns/arguments.hh"
 
-<<<<<<< HEAD
 void LUABackend::getAllMasters(vector<DomainInfo>* domains) {
 	
     if (f_lua_getupdatedmasters == 0)
