@@ -38,6 +38,16 @@ uint32_t localtime_format_YYYYMMDDSS(time_t t, uint32_t seq)
     + seq;
 }
 
+bool editSOAData(DNSSECKeeper& dk, SOAData& sdata) {
+  string kind;
+  dk.getSoaEdit(sdata.qname, kind);
+  if(kind.empty())
+    return false;
+
+  sdata.serial = calculateEditSOA(sdata, kind);
+  return true;
+}
+
 uint32_t calculateEditSOA(uint32_t old_serial, const string& kind, const DNSName& zonename)
 {
   uint32_t startOfWeekOffset = getStartOfWeekOffset(rr.dr.d_name);

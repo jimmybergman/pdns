@@ -90,7 +90,7 @@ public:
         bool createSlaveDomain( const string& ip, const DNSName& domain, const string &nameserver, const string& account ) override;
         bool superMasterBackend( const string& ip, const DNSName& domain, const vector<DNSResourceRecord>& nsset, string *nameserver, string* account, DNSBackend** ddb ) override;
 
-        void getUpdatedMasters( vector<DomainInfo>* updated ) override;
+        void getAllMasters( vector<DomainInfo>* domains ) override;
         void getUnfreshSlaveInfos( vector<DomainInfo>* unfresh ) override;
 
         void setFresh( uint32_t domain_id ) override;

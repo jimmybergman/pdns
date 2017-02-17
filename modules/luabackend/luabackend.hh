@@ -62,7 +62,7 @@ public:
 
 //  MASTER BACKEND
 
-    void getUpdatedMasters(vector<DomainInfo>* domains) override;
+    void getAllMasters(vector<DomainInfo>* domains) override;
     void setNotified(uint32_t id, uint32_t serial) override;
 
 

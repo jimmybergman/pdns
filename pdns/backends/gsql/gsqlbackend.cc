@@ -374,7 +374,7 @@ void GSQLBackend::getUnfreshSlaveInfos(vector<DomainInfo> *unfreshDomains)
   }
 }
 
-void GSQLBackend::getUpdatedMasters(vector<DomainInfo> *updatedDomains)
+void GSQLBackend::getAllMasters(vector<DomainInfo> *allMasters)
 {
   /* list all domains that need notifications for which we are master, and insert into updatedDomains
      id,name,master IP,serial */
@@ -390,7 +390,6 @@ void GSQLBackend::getUpdatedMasters(vector<DomainInfo> *updatedDomains)
     throw PDNSException("GSQLBackend unable to retrieve list of master domains: "+e.txtReason());
   }
 
-  vector<DomainInfo> allMasters;
   size_t numanswers=d_result.size();
   for(size_t n=0;n<numanswers;++n) { // id,name,master,last_check,notified_serial
     DomainInfo sd;
@@ -405,18 +404,7 @@ void GSQLBackend::getUpdatedMasters(vector<DomainInfo> *updatedDomains)
     sd.notified_serial=pdns_stou(d_result[n][4]);
     sd.backend=this;
     sd.kind=DomainInfo::Master;
-    allMasters.push_back(sd);
-  }
-
-  for(vector<DomainInfo>::iterator i=allMasters.begin();i!=allMasters.end();++i) {
-    SOAData sdata;
-    sdata.serial=0;
-    sdata.refresh=0;
-    getSOA(i->zone,sdata);
-    if(i->notified_serial!=sdata.serial) {
-      i->serial=sdata.serial;
-      updatedDomains->push_back(*i);
-    }
+    allMasters->push_back(sd);
   }
 }
 

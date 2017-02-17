@@ -672,9 +672,9 @@ whenever a domain is changed. Periodically, PowerDNS queries backends
 for domains that may have changed, and sends out notifications for slave
 nameservers.
 
-In order to do so, PowerDNS calls the ``getUpdatedMasters()`` method.
-Like the ``getUnfreshSlaveInfos()`` function mentioned above, this
-should add changed domain names to the vector passed.
+In order to do so, PowerDNS calls the ``getAllMasters()`` method.
+This should add all domain names where we are considered master
+to the vector passed.
 
 The following excerpt from the DNSBackend shows the relevant functions:
 
@@ -683,7 +683,7 @@ The following excerpt from the DNSBackend shows the relevant functions:
           class DNSBackend {
           public:
                /* ... */
-           virtual void getUpdatedMasters(vector<DomainInfo>* domains);
+           virtual void getAllMasters(vector<DomainInfo>* domains);
            virtual void setNotified(uint32_t id, uint32_t serial);
                /* ... */
          }
@@ -695,7 +695,7 @@ make sure that the 'DNSBackend \*db' field of the SOAData record is
 filled out correctly - it is used to determine which backend will house
 this zone.
 
-.. cpp:function:: void DNSBackend::getUpdatedMasters(vector<DomainInfo>* domains)
+.. cpp:function:: void DNSBackend::getAllMasters(vector<DomainInfo>* domains)
 
   When called, the backend should examine its list of master domains and
   add any changed ones to the :cpp:class:`DomainInfo` vector.

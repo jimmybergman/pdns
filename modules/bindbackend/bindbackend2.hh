@@ -190,7 +190,7 @@ public:
   Bind2Backend(const string &suffix="", bool loadZones=true); 
   ~Bind2Backend();
   void getUnfreshSlaveInfos(vector<DomainInfo> *unfreshDomains) override;
-  void getUpdatedMasters(vector<DomainInfo> *changedDomains) override;
+  void getAllMasters(vector<DomainInfo> *masterDomains) override;
   bool getDomainInfo(const DNSName &domain, DomainInfo &di, bool getSerial=true ) override;
   time_t getCtime(const string &fname);
    // DNSSEC

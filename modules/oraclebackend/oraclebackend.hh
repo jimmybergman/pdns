@@ -79,7 +79,7 @@ public:
   bool getDomainInfo(const DNSName& domain, DomainInfo &di) override;
   void alsoNotifies(const DNSName& domain, set<string> *addrs) override;
   void getUnfreshSlaveInfos(vector<DomainInfo>* domains) override;
-  void getUpdatedMasters(vector<DomainInfo>* domains) override;
+  void getAllMasters(vector<DomainInfo>* domains) override;
   void setFresh(uint32_t zoneId) override;
   void setNotified(uint32_t zoneId, uint32_t serial) override;
   bool list(const DNSName& domain, int zoneId, bool include_disabled=false) override;

@@ -200,7 +200,7 @@ public:
   bool superMasterBackend(const string &ip, const DNSName &domain, const vector<DNSResourceRecord>&nsset, string *nameserver, string *account, DNSBackend **db) override;
   void setFresh(uint32_t domain_id) override;
   void getUnfreshSlaveInfos(vector<DomainInfo> *domains) override;
-  void getUpdatedMasters(vector<DomainInfo> *updatedDomains) override;
+  void getAllMasters(vector<DomainInfo> *allMasters) override;
   bool getDomainInfo(const DNSName &domain, DomainInfo &di, bool getSerial=true) override;
   void setNotified(uint32_t domain_id, uint32_t serial) override;
   bool setMaster(const DNSName &domain, const string &ip) override;

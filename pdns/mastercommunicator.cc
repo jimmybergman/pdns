@@ -24,6 +24,7 @@
 #endif
 #include "auth-caches.hh"
 #include "utility.hh"
+#include "dnsseckeeper.hh"
 #include <errno.h>
 #include "communicator.hh"
 #include <set>
@@ -105,10 +106,19 @@ bool CommunicatorClass::notifyDomain(const DNSName &domain)
 {
   DomainInfo di;
   UeberBackend B;
+  DNSSECKeeper dk (&B); // reuse our UeberBackend copy for DNSSECKeeper
   if(!B.getDomainInfo(domain, di)) {
     g_log<<Logger::Error<<"No such domain '"<<domain<<"' in our database"<<endl;
     return false;
   }
+
+  SOAData sdata;
+  sdata.serial=0;
+  sdata.refresh=0;
+  B.getSOAUncached(di.zone, sdata);
+  editSOAData(dk, sdata);
+  di.serial = sdata.serial;
+
   queueNotifyDomain(di, &B);
   // call backend and tell them we sent out the notification - even though that is premature    
   di.backend->setNotified(di.id, di.serial);
@@ -130,25 +140,40 @@ void CommunicatorClass::masterUpdateCheck(PacketHandler *P)
     return; 
 
   UeberBackend *B=P->getBackend();
-  vector<DomainInfo> cmdomains;
-  B->getUpdatedMasters(&cmdomains);
+  DNSSECKeeper dk (B); // reuse our UeberBackend copy for DNSSECKeeper
+
+  vector<DomainInfo> updatedDomains;
+  vector<DomainInfo> allMasters;
+
+  B->getAllMasters(&allMasters);
+  for(vector<DomainInfo>::iterator i=allMasters.begin();i!=allMasters.end();++i) {
+    SOAData sdata;
+    sdata.serial=0;
+    sdata.refresh=0;
+    B->getSOAUncached(i->zone,sdata);
+    editSOAData(dk, sdata);
+    if(i->notified_serial!=sdata.serial) {
+      i->serial=sdata.serial;
+      updatedDomains.push_back(*i);
+    }
+  }
   
-  if(cmdomains.empty()) {
+  if(updatedDomains.empty()) {
     if(d_masterschanged)
       g_log<<Logger::Warning<<"No master domains need notifications"<<endl;
     d_masterschanged=false;
   }
   else {
     d_masterschanged=true;
-    g_log<<Logger::Error<<cmdomains.size()<<" domain"<<(cmdomains.size()>1 ? "s" : "")<<" for which we are master need"<<
-      (cmdomains.size()>1 ? "" : "s")<<
+    g_log<<Logger::Error<<updateDomains.size()<<" domain"<<(updatedDomains.size()>1 ? "s" : "")<<" for which we are master need"<<
+      (updatedDomains.size()>1 ? "" : "s")<<
       " notifications"<<endl;
   }
 
   // figure out A records of everybody needing notification
   // do this via the FindNS class, d_fns
   
-  for(auto& di : cmdomains) {
+  for(auto& di : updateDomains) {
     purgeAuthCachesExact(di.zone);
     queueNotifyDomain(di, B);
     di.backend->setNotified(di.id, di.serial);

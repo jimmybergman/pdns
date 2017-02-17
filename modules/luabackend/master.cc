@@ -28,13 +28,14 @@
 #include "pdns/logger.hh"
 #include "pdns/arguments.hh"
 
-void LUABackend::getUpdatedMasters(vector<DomainInfo>* domains) {
+<<<<<<< HEAD
+void LUABackend::getAllMasters(vector<DomainInfo>* domains) {
 	
     if (f_lua_getupdatedmasters == 0)
 	return;
 
     if (logging)
-	g_log << Logger::Info << backend_name << "(getUpdatedMasters) BEGIN" << endl;
+	g_log << Logger::Info << backend_name << "(getAllMasters) BEGIN" << endl;
 
     lua_rawgeti(lua, LUA_REGISTRYINDEX, f_lua_getupdatedmasters);
 
@@ -52,10 +53,10 @@ void LUABackend::getUpdatedMasters(vector<DomainInfo>* domains) {
         return;
     }
     
-    domains_from_table(domains, "getUpdatedMasters");
+    domains_from_table(domains, "getAllMasters");
     
     if (logging)
-	g_log << Logger::Info << backend_name << "(getUpdatedMasters) END" << endl;
+	g_log << Logger::Info << backend_name << "(getAllMasters) END" << endl;
 }
 
 void LUABackend::setNotified(uint32_t id, uint32_t serial) {
